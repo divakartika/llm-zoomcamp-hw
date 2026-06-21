@@ -1,0 +1,47 @@
+import time
+from minsearch import Index
+from sqlitesearch import TextSearchIndex
+from gitsource import GithubRepositoryDataReader
+
+def load_github_data():
+
+    reader = GithubRepositoryDataReader(
+        repo_owner="DataTalksClub",
+        repo_name="llm-zoomcamp",
+        commit_id="8c1834d",
+        allowed_extensions={"md"},
+        filename_filter=lambda path: "/lessons/" in path,
+    )
+
+    files = reader.read()
+    documents = []
+
+    for file in files:
+        doc = file.parse()
+        documents.append(doc)
+    
+    return documents
+
+def build_index(documents):
+    index = Index(
+        text_fields=["content"],
+        keyword_fields=["filename"]
+    )
+
+    index.fit(documents)
+    return index
+
+def build_persistent_index(documents):
+    index = TextSearchIndex(
+        text_fields=["content"],
+        keyword_fields=["filename"],
+        db_path="github.db"
+    )
+
+    for doc in documents:
+        index.add(doc)
+        print(f"""Added: {doc["filename"][:60]}...""")
+        time.sleep(0.5)
+
+    print("Done. Index saved to github.db")
+    return index
