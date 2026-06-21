@@ -43,5 +43,6 @@ def build_persistent_index(documents):
         print(f"""Added: {doc["filename"][:60]}...""")
         time.sleep(0.5)
 
+    index.close()
     print("Done. Index saved to github.db")
     return index
