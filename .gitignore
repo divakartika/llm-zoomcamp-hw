@@ -1,5 +1,8 @@
 .env
 .venv
 .python-version
-uv.lock
+*.lock
 __pycache__/
+models/
+pyproject*
+pyproject.toml
