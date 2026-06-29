@@ -1,90 +1,56 @@
-# LLM Zoomcamp - Homework 1: Agentic RAG
+# LLM Zoomcamp Homework Solutions
 
-This repository contains the solution and implementation for **Homework 1: Agentic RAG** from the [LLM Zoomcamp](https://github.com/DataTalksClub/llm-zoomcamp/tree/main) course by [DataTalksClub](https://datatalks.club/).
+This repository contains solutions for two homework assignments from the [LLM Zoomcamp](https://github.com/DataTalksClub/llm-zoomcamp/tree/main) course by [DataTalksClub](https://datatalks.club/):
 
-The project demonstrates the core differences between a plain Retrieval-Augmented Generation (RAG) pipeline and an autonomous **Agentic Loop** using function calling and tool execution.
+- **Homework 1: Agentic RAG** in [hw_1_agentic_rag.ipynb](hw_1_agentic_rag.ipynb)
+- **Homework 2: Vector Search** in [hw_2_vector_search.ipynb](hw_2_vector_search.ipynb)
 
-## 🚀 Project Overview
+## Overview
 
-The objective of this project is to build a course teaching assistant capable of answering student queries using a course FAQ dataset. While a traditional RAG pipeline struggles with user typos or multi-step reasoning, this implementation leverages an intelligent agent that can seamlessly recover from search failures (e.g., handling spelling mistakes like `"Olama"` vs `"Ollama"`).
+The project explores two core retrieval and generation patterns used in modern LLM systems:
 
-### Key Features
-- **Data Ingestion:** Automatically fetches the official DataTalksClub course FAQ data from a JSON endpoint.
-- **Lexical Search Indexing:** Uses `minsearch` (a lightweight, in-memory text search engine) to index questions, sections, and answers.
-- **Agentic Loop Workflow:** Implements tool registration and autonomous execution using `toyaikit`.
-- **Error Recovery:** The agent evaluates its own search results, adjusts query keywords dynamically, and performs multiple iterative searches to find accurate answers.
+1. **Homework 1: Agentic RAG**
+   - Builds a simple RAG pipeline over course lesson content.
+   - Compares plain retrieval with an agentic loop that can call a search tool multiple times.
+   - Uses `minsearch`, `toyaikit`, and the OpenAI API.
 
----
+2. **Homework 2: Vector Search**
+   - Uses embeddings to represent text chunks and compare them with cosine similarity.
+   - Demonstrates vector search, text search, and hybrid search with Reciprocal Rank Fusion (RRF).
+   - Uses the local ONNX embedder and search utilities from the course repository.
 
-## 🛠️ Tech Stack & Dependencies
+## Repository Structure
 
-The project is built entirely in Python inside a Jupyter Notebook environment using the following tools:
-- **Python (3.14+)**
-- **Jupyter Notebook**
-- **`minsearch`**: In-memory keyword search framework for text indexing.
-- **`toyaikit`**: An experimentation framework wrapping the agentic loop, message histories, and inline tool visualization.
-- **OpenAI API Client**: Powers the underlying reasoning engine using modern `responses` schema definitions (`gpt-5.4-mini`).
-- **`python-dotenv`**: Secure API key configuration management.
+- [hw_1_agentic_rag.ipynb](hw_1_agentic_rag.ipynb): notebook for the agentic RAG homework.
+- [hw_2_vector_search.ipynb](hw_2_vector_search.ipynb): notebook for the vector search homework.
+- [embedder.py](embedder.py): wrapper around the ONNX sentence embedding model.
+- [ingest.py](ingest.py): helpers for building search indexes from course documents.
+- [rag_helper.py](rag_helper.py): supporting logic for the RAG experiments.
+- [download.py](download.py): data download utilities.
 
----
+## Setup
 
-## 🔧 Installation & Setup
-
-1. **Clone the Repository:**
+1. Install the project dependencies from [pyproject.toml](pyproject.toml):
    ```bash
-   git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
-   cd your-repo-name
+   pip install -e .
+   ```
+   If you prefer, you can also install the packages manually from the same configuration file.
+
+2. Create a `.env` file with your OpenAI API key:
+   ```bash
+   OPENAI_API_KEY=your-api-key
    ```
 
-2. **Install Dependencies:**
-   It is highly recommended to manage the environment using `uv` or standard `pip`:
+3. Launch Jupyter and open either notebook:
    ```bash
-   uv add requests minsearch openai jupyter python-dotenv toyaikit
-   # OR
-   pip install requests minsearch openai jupyter python-dotenv toyaikit
+   jupyter notebook
    ```
 
-3. **Configure Environment Variables:**
-   Create a `.env` file in the root directory to store your API credentials securely:
-   ```bash
-   OPENAI_API_KEY=sk-your-actual-api-key-here
-   ```
+4. Follow the official homework instructions from the [LLM Zoomcamp 2026 cohort](https://github.com/DataTalksClub/llm-zoomcamp/tree/main/cohorts/2026).
 
-4. **Launch Jupyter Notebook:**
-   ```bash
-   uv run jupyter notebook
-   ```
-   Open `sandbox.ipynb` to execute the cells.
+## What You Will Learn
 
----
-
-## 💡 How it Works: RAG vs. Agentic Loop
-
-### 1. Traditional/Plain RAG
-
-The application searches the FAQ dataset exactly once using the user's raw query, constructs a structured prompt template containing the retrieved context block, and forwards it to the LLM.
-
-* **Limitation:** If a student types a keyword typo, the lexical index returns empty results, causing the pipeline to break or generate an unhelpful `"I don't know"` response.
-
-### 2. The Agentic Loop
-
-By registering the `search()` function as a valid JSON-schema tool within `toyaikit.tools`, the LLM is placed in the driver's seat:
-
-* It autonomously determines whether it needs to use the search tool.
-* It reformulates the raw input question into cleaner search tokens.
-* It inspects search outputs and loops back to execute new searches with distinct keywords if initial results are insufficient.
-
-```text
-Student Question ──> LLM reasons ──> Calls Search Tool ──> Evaluates Results ──> Final Answer
-```
-
----
-
-## 📈 Notebook Walkthrough
-
-The `sandbox.ipynb` notebook implements the entire pipeline step by step:
-
-1. **Get Data:** Pulls the multi-course FAQ source files.
-2. **Indexing:** Configures text fields (`question`, `section`, `answer`) and keyword filtering (`course`).
-3. **Tool Schema Generation:** Uses Python type-hints and docstrings to let `toyaikit` automatically derive production-ready tool definitions.
-4. **Agent Execution:** Instantiates an `OpenAIResponsesRunner` driven by standard developer instructions, guiding it to evaluate search trajectory before concluding the loop.
+- How a basic RAG pipeline retrieves context for an LLM.
+- How an agentic loop can improve search by using tools iteratively.
+- How embeddings enable semantic similarity search.
+- How hybrid retrieval combines keyword and vector signals.
